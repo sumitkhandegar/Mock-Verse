@@ -5,23 +5,22 @@ import "./globals.css";
 const monaSans = Mona_Sans({
   variable: "--font-mona-sans",
   subsets: ["latin"],
+  display: 'swap',
 });
 
 export const metadata: Metadata = {
   title: "mockverse",
-  description: "Creted by Sumit Khandegar",
+  description: "Created by Sumit Khandegar",
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
-    <html lang="en" className="dark">
-      <body
-        className={`${monaSans.className} antialiased`}
-      >
+    <html lang="en" className="dark" suppressHydrationWarning>
+      <body className={`${monaSans.variable} font-sans antialiased`}>
         {children}
       </body>
     </html>
