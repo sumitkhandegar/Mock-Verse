@@ -39,3 +39,8 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 
 Vapi
 shadcn.ui
+
+2.28.40
+
+
+https://github.com/adrianhajdin/ai_mock_interviews
