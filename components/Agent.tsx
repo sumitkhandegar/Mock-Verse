@@ -167,71 +167,72 @@ const Agent = ({
 
   return (
     <>
-      <div className="call-view">
+      {/* Interviewer and User Cards */}
+      <div className="flex justify-center items-center gap-10 flex-wrap sm:flex-nowrap mb-8">
         {/* AI Interviewer Card */}
-        <div className="card-interviewer">
-          <div className="avatar">
+        <div className="flex flex-col items-center gap-2 p-4 bg-white shadow-md rounded-xl w-64 text-center">
+          <div className="relative">
             <Image
               src="/ai-avatar.png"
-              alt="profile-image"
+              alt="AI Interviewer"
               width={65}
-              height={54}
-              className="object-cover"
+              height={65}
+              className="rounded-full object-cover"
             />
-            {isSpeaking && <span className="animate-speak" />}
+            {isSpeaking && (
+              <span className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full animate-pulse" />
+            )}
           </div>
-          <h3>AI Interviewer</h3>
+          <h3 className="font-semibold text-gray-800">AI Interviewer</h3>
         </div>
 
         {/* User Profile Card */}
-        <div className="card-border">
-          <div className="card-content">
-            <Image
-              src="/user-avatar.png"
-              alt="profile-image"
-              width={539}
-              height={539}
-              className="rounded-full object-cover size-[120px]"
-            />
-            <h3>{userName}</h3>
-          </div>
+        <div className="flex flex-col items-center gap-2 p-4 bg-white shadow-md rounded-xl w-64 text-center">
+          <Image
+            src="/user-avatar.png"
+            alt="User Avatar"
+            width={120}
+            height={120}
+            className="rounded-full object-cover"
+          />
+          <h3 className="font-semibold text-gray-800">{userName}</h3>
         </div>
       </div>
 
+      {/* Live Transcript Section */}
       {messages.length > 0 && (
-        <div className="transcript-border">
-          <div className="transcript">
-            <p
-              key={lastMessage}
-              className={cn(
-                "transition-opacity duration-500 opacity-0",
-                "animate-fadeIn opacity-100"
-              )}
-            >
-              {lastMessage}
-            </p>
+        <div className="mx-auto max-w-3xl bg-gray-100 p-6 rounded-lg shadow-inner mb-8">
+          <div className="text-center text-gray-800 text-lg font-medium animate-fadeIn">
+            <p key={lastMessage}>{lastMessage}</p>
           </div>
         </div>
       )}
 
+      {/* Call / End Button */}
       <div className="w-full flex justify-center">
         {callStatus !== "ACTIVE" ? (
-          <button className="relative btn-call" onClick={() => handleCall()}>
+          <button
+            onClick={handleCall}
+            className="relative px-6 py-3 bg-blue-600 text-white font-semibold rounded-full shadow-md hover:bg-blue-700 transition-all"
+          >
+            {/* Ping animation on CONNECTING */}
             <span
               className={cn(
-                "absolute animate-ping rounded-full opacity-75",
+                "absolute inset-0 rounded-full bg-blue-400 opacity-50 animate-ping",
                 callStatus !== "CONNECTING" && "hidden"
               )}
             />
-
-            <span className="relative">
+            <span className="relative z-10">
               {callStatus === "INACTIVE" || callStatus === "FINISHED"
                 ? "Call"
-                : ". . ."}
+                : "..."}
             </span>
           </button>
         ) : (
-          <button className="btn-disconnect" onClick={() => handleDisconnect()}>
+          <button
+            onClick={handleDisconnect}
+            className="px-6 py-3 bg-red-600 text-white font-semibold rounded-full shadow-md hover:bg-red-700 transition-all"
+          >
             End
           </button>
         )}

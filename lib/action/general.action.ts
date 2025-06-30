@@ -6,7 +6,6 @@ import { google } from "@ai-sdk/google";
 import { db } from "@/firebase/admin";
 import { feedbackSchema } from "@/constants";
 
-// Define the CreateFeedbackParams type if not already imported
 type CreateFeedbackParams = {
   interviewId: string;
   userId: string;
@@ -32,23 +31,17 @@ export async function createFeedback(params: CreateFeedbackParams) {
       schema: feedbackSchema,
       prompt: `
         You are an AI interviewer analyzing a mock interview. Your task is to evaluate the candidate based on structured categories. Be thorough and detailed in your analysis. Don't be lenient with the candidate. If there are mistakes or areas for improvement, point them out.
+
         Transcript:
         ${formattedTranscript}
-
-        Please score the candidate from 0 to 100 in the following areas. Do not add categories other than the ones provided:
-        - **Communication Skills**: Clarity, articulation, structured responses.
-        - **Technical Knowledge**: Understanding of key concepts for the role.
-        - **Problem-Solving**: Ability to analyze problems and propose solutions.
-        - **Cultural & Role Fit**: Alignment with company values and job role.
-        - **Confidence & Clarity**: Confidence in responses, engagement, and clarity.
-        `,
+      `,
       system:
-        "You are a professional interviewer analyzing a mock interview. Your task is to evaluate the candidate based on structured categories",
+        "You are a professional interviewer analyzing a mock interview. Your task is to evaluate the candidate based on structured categories.",
     });
 
     const feedback = {
-      interviewId: interviewId,
-      userId: userId,
+      interviewId,
+      userId,
       totalScore: object.totalScore,
       categoryScores: object.categoryScores,
       strengths: object.strengths,
@@ -57,13 +50,9 @@ export async function createFeedback(params: CreateFeedbackParams) {
       createdAt: new Date().toISOString(),
     };
 
-    let feedbackRef;
-
-    if (feedbackId) {
-      feedbackRef = db.collection("feedback").doc(feedbackId);
-    } else {
-      feedbackRef = db.collection("feedback").doc();
-    }
+    const feedbackRef = feedbackId
+      ? db.collection("feedback").doc(feedbackId)
+      : db.collection("feedback").doc();
 
     await feedbackRef.set(feedback);
 
@@ -74,7 +63,6 @@ export async function createFeedback(params: CreateFeedbackParams) {
   }
 }
 
-// Define the Interview type if not already imported
 type Interview = {
   role: string;
   techstack: string;
@@ -83,21 +71,18 @@ type Interview = {
   userId: string;
   createdAt: string;
   finalized: boolean;
-  // Add other fields as needed
 };
 
 export async function getInterviewById(id: string): Promise<Interview | null> {
   const interview = await db.collection("interviews").doc(id).get();
-
   return interview.data() as Interview | null;
 }
 
 type GetFeedbackByInterviewIdParams = {
   interviewId: string;
-  userId: string;
+  userId?: string;
 };
 
-// Define the Feedback type if not already imported
 type Feedback = {
   id?: string;
   interviewId: string;
@@ -115,6 +100,27 @@ export async function getFeedbackByInterviewId(
 ): Promise<Feedback | null> {
   const { interviewId, userId } = params;
 
+  if (!userId) {
+    // Return fallback demo feedback
+    return {
+      id: "demo-feedback",
+      interviewId: "demo-interview",
+      userId: "demo-user",
+      totalScore: 78,
+      categoryScores: {
+        "Communication Skills": 82,
+        "Technical Knowledge": 75,
+        "Problem-Solving": 70,
+        "Cultural & Role Fit": 76,
+        "Confidence & Clarity": 85,
+      },
+      strengths: ["Clear communicator", "Strong confidence"],
+      areasForImprovement: ["Improve technical precision", "Be more concise"],
+      finalAssessment: "Strong candidate with minor gaps.",
+      createdAt: new Date().toISOString(),
+    };
+  }
+
   const querySnapshot = await db
     .collection("feedback")
     .where("interviewId", "==", interviewId)
@@ -129,7 +135,7 @@ export async function getFeedbackByInterviewId(
 }
 
 type GetLatestInterviewsParams = {
-  userId: string;
+  userId?: string;
   limit?: number;
 };
 
@@ -138,23 +144,51 @@ export async function getLatestInterviews(
 ): Promise<Interview[] | null> {
   const { userId, limit = 20 } = params;
 
-  const interviews = await db
+  if (!userId) {
+    return [
+      {
+        id: "demo-int-001",
+        userId: "demo-user",
+        role: "Backend Developer",
+        techstack: "Node.js, Express",
+        type: "Behavioral",
+        finalized: true,
+        createdAt: new Date().toISOString(),
+      },
+    ];
+  }
+
+  const querySnapshot = await db
     .collection("interviews")
     .orderBy("createdAt", "desc")
     .where("finalized", "==", true)
-    .where("userId", "!=", userId)
+    .where("userId", "==", userId)
     .limit(limit)
     .get();
 
-  return interviews.docs.map((doc) => ({
+  return querySnapshot.docs.map((doc) => ({
     id: doc.id,
     ...doc.data(),
   })) as Interview[];
 }
 
 export async function getInterviewsByUserId(
-  userId: string
+  userId?: string
 ): Promise<Interview[] | null> {
+  if (!userId) {
+    return [
+      {
+        id: "demo-interview",
+        userId: "demo-user",
+        role: "Frontend Developer",
+        techstack: "React, TypeScript",
+        type: "Technical",
+        createdAt: new Date().toISOString(),
+        finalized: true,
+      },
+    ];
+  }
+
   const interviews = await db
     .collection("interviews")
     .where("userId", "==", userId)

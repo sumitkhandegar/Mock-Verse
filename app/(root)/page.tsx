@@ -6,8 +6,8 @@ import InterviewCard from "../../components/InterviewCard";
 
 import { getCurrentUser } from "../../lib/action/auth.action";
 import {
-  getInterviewsByUserId,
   getLatestInterviews,
+  getInterviewsByUserId,
 } from "../../lib/action/general.action";
 
 async function Home() {
@@ -22,32 +22,39 @@ async function Home() {
   const hasUpcomingInterviews = allInterview?.length! > 0;
 
   return (
-    <>
-      <section className="card-cta">
-        <div className="flex flex-col gap-6 max-w-lg">
-          <h2>Get Interview-Ready with AI-Powered Practice & Feedback</h2>
-          <p className="text-lg">
-            Practice real interview questions & get instant feedback
+    <main className="px-4 sm:px-8 md:px-12 py-10 space-y-16">
+      {/* CTA Section */}
+      <section className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-8 flex flex-col sm:flex-row items-center justify-between shadow-sm">
+        <div className="flex flex-col gap-4 max-w-xl">
+          <h1 className="text-4xl font-extrabold text-gray-800 leading-tight">
+            Get Interview-Ready with{" "}
+            <span className="text-blue-600">AI-Powered Practice</span> &
+            Feedback
+          </h1>
+          <p className="text-lg text-gray-700">
+            Practice real interview questions & get instant feedback to level up
+            your performance.
           </p>
-
-          <Button asChild className="btn-primary max-sm:w-full">
+          <Button
+            asChild
+            className="w-fit bg-blue-600 hover:bg-blue-700 text-white mt-4 shadow-lg"
+          >
             <Link href="/interview">Start an Interview</Link>
           </Button>
         </div>
-
         <Image
           src="/robot.png"
-          alt="robo-dude"
-          width={400}
-          height={400}
-          className="max-sm:hidden"
+          alt="AI Interview Assistant"
+          width={350}
+          height={350}
+          className="hidden sm:block"
         />
       </section>
 
-      <section className="flex flex-col gap-6 mt-8">
-        <h2>Your Interviews</h2>
-
-        <div className="interviews-section">
+      {/* Your Interviews Section */}
+      <section className="space-y-6">
+        <h2 className="text-2xl font-bold text-gray-800">Your Interviews</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {hasPastInterviews ? (
             userInterviews?.map((interview) => (
               <InterviewCard
@@ -56,20 +63,26 @@ async function Home() {
                 interviewId={interview.id ?? ""}
                 role={interview.role}
                 type={interview.type}
-                techstack={Array.isArray(interview.techstack) ? interview.techstack : [interview.techstack]}
+                techstack={
+                  Array.isArray(interview.techstack)
+                    ? interview.techstack
+                    : [interview.techstack]
+                }
                 createdAt={interview.createdAt}
               />
             ))
           ) : (
-            <p>You haven&apos;t taken any interviews yet</p>
+            <p className="text-gray-600 col-span-full">
+              You haven&apos;t taken any interviews yet.
+            </p>
           )}
         </div>
       </section>
 
-      <section className="flex flex-col gap-6 mt-8">
-        <h2>Take Interviews</h2>
-
-        <div className="interviews-section">
+      {/* Available Interviews Section */}
+      <section className="space-y-6">
+        <h2 className="text-2xl font-bold text-gray-800">Take Interviews</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {hasUpcomingInterviews ? (
             allInterview?.map((interview) => (
               <InterviewCard
@@ -78,16 +91,22 @@ async function Home() {
                 interviewId={interview.id ?? ""}
                 role={interview.role}
                 type={interview.type}
-                techstack={Array.isArray(interview.techstack) ? interview.techstack : [interview.techstack]}
+                techstack={
+                  Array.isArray(interview.techstack)
+                    ? interview.techstack
+                    : [interview.techstack]
+                }
                 createdAt={interview.createdAt}
               />
             ))
           ) : (
-            <p>There are no interviews available</p>
+            <p className="text-gray-600 col-span-full">
+              There are no interviews available.
+            </p>
           )}
         </div>
       </section>
-    </>
+    </main>
   );
 }
 
